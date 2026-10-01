@@ -28,6 +28,42 @@ class EntryPayload(BaseModel):
     remark: str | None = None
 
 
+class AssessmentItem(BaseModel):
+    """批量考核里的一条：定位记录，带上考核结果；不通过时必须给退回原因。"""
+
+    entry_id: int
+    考核结果: str | None = None
+    考核方式: str | None = None
+    退回原因: str | None = None
+    考核日期: str | None = None
+
+
+class AssessmentBatchPayload(BaseModel):
+    """成批提交考核结果：整批当成一件事，一次受理。"""
+
+    items: list[AssessmentItem] = Field(default_factory=list)
+
+
+class AssessmentReceipt(BaseModel):
+    """单条考核的处理回执：每条都有明确结论，不静默吞掉。"""
+
+    entry_id: int | None = None
+    培训编号: str | None = None
+    培训对象: str | None = None
+    ok: bool
+    outcome: str  # 已入档 / 已退回 / 已跳过 / 待补正
+    message: str
+
+
+class AssessmentBatchResult(BaseModel):
+    """整批处理结果：汇总计数 + 每条回执。"""
+
+    ok: bool
+    message: str
+    summary: dict[str, int] = Field(default_factory=dict)
+    results: list[AssessmentReceipt] = Field(default_factory=list)
+
+
 
 class RegisterEntry(BaseModel):
     """设备登记明细结构。"""
