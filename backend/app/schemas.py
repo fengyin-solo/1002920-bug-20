@@ -28,6 +28,38 @@ class EntryPayload(BaseModel):
     remark: str | None = None
 
 
+class AssessmentItemPayload(BaseModel):
+    """整批送审中的一行：一个人一次考核的结果。"""
+
+    entry_id: int | None = None
+    人员编号: str | None = None
+    培训内容: str | None = None
+    考核结果: str = "通过"
+    退回原因: str | None = None
+
+
+class BatchAssessmentPayload(BaseModel):
+    """整批提交考核结果：一批人作为一件事处理，允许携带批次号重发。"""
+
+    batch_no: str | None = None
+    items: list[AssessmentItemPayload] = Field(default_factory=list)
+
+
+class BatchActionResult(BaseModel):
+    """整批送审的汇总结果：每条都有独立去向，绝不静默卡住。"""
+
+    ok: bool
+    batch_no: str
+    total: int
+    passed: int = 0
+    rejected: int = 0
+    skipped: int = 0
+    pending: int = 0
+    message: str
+    items: list[dict[str, Any]] = Field(default_factory=list)
+
+
+
 
 class RegisterEntry(BaseModel):
     """设备登记明细结构。"""
